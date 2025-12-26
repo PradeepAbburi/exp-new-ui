@@ -11,36 +11,40 @@ export default {
         sm: ".1875rem", /* 3px */
       },
       colors: {
-        // Flat / base colors (regular buttons)
-        background: "hsl(var(--background) / <alpha-value>)",
-        foreground: "hsl(var(--foreground) / <alpha-value>)",
-        border: "hsl(var(--border) / <alpha-value>)",
-        input: "hsl(var(--input) / <alpha-value>)",
-        card: {
-          DEFAULT: "hsl(var(--card) / <alpha-value>)",
-          foreground: "hsl(var(--card-foreground) / <alpha-value>)",
-          border: "hsl(var(--card-border) / <alpha-value>)",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover) / <alpha-value>)",
-          foreground: "hsl(var(--popover-foreground) / <alpha-value>)",
-          border: "hsl(var(--popover-border) / <alpha-value>)",
-        },
+        background: "hsl(0 0% 13%)", // #202020
+        foreground: "hsl(0 0% 100%)",
         primary: {
-          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
-          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
-          border: "var(--primary-border)",
+          DEFAULT: "hsl(174 100% 29%)", // Teal
+          foreground: "hsl(0 0% 100%)",
+        },
+        card: {
+          DEFAULT: "hsl(0 0% 16%)",
+          foreground: "hsl(0 0% 100%)",
+        },
+        border: "hsl(0 0% 25%)",
+        muted: {
+          DEFAULT: "hsl(0 0% 20%)",
+          foreground: "hsl(0 0% 60%)",
+        },
+        input: "hsl(0 0% 25%)",
+        ring: "hsl(174 100% 29%)",
+        popover: {
+          DEFAULT: "hsl(0 0% 16%)",
+          foreground: "hsl(0 0% 100%)",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
-          foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
-          border: "var(--secondary-border)",
+          DEFAULT: "hsl(0 0% 20%)",
+          foreground: "hsl(0 0% 100%)",
         },
-        muted: {
-          DEFAULT: "hsl(var(--muted) / <alpha-value>)",
-          foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
-          border: "var(--muted-border)",
+        accent: {
+          DEFAULT: "hsl(0 0% 20%)",
+          foreground: "hsl(0 0% 100%)",
         },
+        destructive: {
+          DEFAULT: "hsl(0 62% 30%)",
+          foreground: "hsl(0 0% 100%)",
+        },
+        // Flat / base colors (regular buttons)
         accent: {
           DEFAULT: "hsl(var(--accent) / <alpha-value>)",
           foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
@@ -83,9 +87,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)"],
-        serif: ["var(--font-serif)"],
-        mono: ["var(--font-mono)"],
+        display: ["'Outfit'", "sans-serif"],
+        body: ["'DM Sans'", "sans-serif"],
+        mono: ["'JetBrains Mono'", "monospace", "var(--font-mono)"],
       },
       keyframes: {
         "accordion-down": {
