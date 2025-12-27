@@ -209,7 +209,19 @@ export function useAuth() {
           return newUser as User;
         }
 
-        return userDoc.data() as User;
+        const existingUser = userDoc.data() as User;
+
+        // Ensure Google users have isProfileComplete set to true
+        if (!existingUser.isProfileComplete) {
+          try {
+            await setDoc(userDocRef, { isProfileComplete: true }, { merge: true });
+            return { ...existingUser, isProfileComplete: true } as User;
+          } catch (updateErr) {
+            console.error("Failed to update isProfileComplete:", updateErr);
+          }
+        }
+
+        return existingUser;
       } catch (error: any) {
         console.error("Google Login Error:", error);
         throw error;

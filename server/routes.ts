@@ -126,7 +126,7 @@ export async function registerRoutes(
   });
 
   app.get(api.articles.get.path, optionalAuth, async (req: any, res) => {
-    const article = await storage.getArticle(Number(req.params.id));
+    const article = await storage.getArticle(req.params.id as any);
     if (!article) return res.status(404).json({ message: "Article not found" });
 
     const author = await storage.getUser(article.authorId);
@@ -150,7 +150,7 @@ export async function registerRoutes(
   app.post(api.articles.translate.path, async (req: any, res) => {
     try {
       const { targetLanguage } = api.articles.translate.input.parse(req.body);
-      const articleId = Number(req.params.id);
+      const articleId = req.params.id as any;
       const article = await storage.getArticle(articleId);
       if (!article) return res.status(404).json({ message: "Article not found" });
 
@@ -165,7 +165,7 @@ export async function registerRoutes(
   app.post(api.articles.report.path, optionalAuth, async (req: any, res) => {
     try {
       const { reason } = api.articles.report.input.parse(req.body);
-      const articleId = Number(req.params.id);
+      const articleId = req.params.id as any;
       const reporterId = req.user?.claims?.sub || "anonymous";
 
       await storage.createReport(articleId, reporterId, reason);
@@ -194,13 +194,13 @@ export async function registerRoutes(
   });
 
   app.patch(api.articles.update.path, requireAuth, async (req: any, res) => {
-    const article = await storage.getArticle(Number(req.params.id));
+    const article = await storage.getArticle(req.params.id as any);
     if (!article) return res.status(404).json({ message: "Article not found" });
     if (article.authorId !== req.user.claims.sub) return res.status(403).json({ message: "Forbidden" });
 
     try {
       const input = api.articles.update.input.parse(req.body);
-      const updated = await storage.updateArticle(Number(req.params.id), input);
+      const updated = await storage.updateArticle(req.params.id as any, input);
       res.json(updated);
     } catch (err) {
       res.status(400).json({ message: "Invalid input" });
@@ -208,26 +208,26 @@ export async function registerRoutes(
   });
 
   app.delete(api.articles.delete.path, requireAuth, async (req: any, res) => {
-    const article = await storage.getArticle(Number(req.params.id));
+    const article = await storage.getArticle(req.params.id as any);
     if (!article) return res.status(404).json({ message: "Article not found" });
     if (article.authorId !== req.user.claims.sub) return res.status(403).json({ message: "Forbidden" });
 
-    await storage.deleteArticle(Number(req.params.id));
+    await storage.deleteArticle(req.params.id as any);
     res.status(204).send();
   });
 
   app.post(api.articles.like.path, requireAuth, async (req: any, res) => {
-    const success = await storage.toggleLike(Number(req.params.id), req.user.claims.sub);
+    const success = await storage.toggleLike(req.params.id as any, req.user.claims.sub);
     res.json({ success });
   });
 
   app.post(api.articles.bookmark.path, requireAuth, async (req: any, res) => {
-    const success = await storage.toggleBookmark(Number(req.params.id), req.user.claims.sub);
+    const success = await storage.toggleBookmark(req.params.id as any, req.user.claims.sub);
     res.json({ success });
   });
 
   app.post(api.articles.view.path, async (req, res) => {
-    await storage.incrementView(Number(req.params.id));
+    await storage.incrementView(req.params.id as any);
     res.status(200).send();
   });
 

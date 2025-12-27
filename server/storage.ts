@@ -27,29 +27,29 @@ export interface IStorage {
   // Articles
   // Articles
   createArticle(article: InsertArticle): Promise<Article>;
-  getArticle(id: number): Promise<Article | undefined>;
+  getArticle(id: any): Promise<Article | undefined>;
   getArticles(view?: string, userId?: string): Promise<(Article & { author: User, likeCount: number, isLiked: boolean, isBookmarked: boolean })[]>;
-  updateArticle(id: number, article: Partial<InsertArticle>): Promise<Article>;
-  deleteArticle(id: number): Promise<void>;
-  incrementView(id: number): Promise<void>;
+  updateArticle(id: any, article: Partial<InsertArticle>): Promise<Article>;
+  deleteArticle(id: any): Promise<void>;
+  incrementView(id: any): Promise<void>;
 
   // Social
-  toggleLike(articleId: number, userId: string): Promise<boolean>;
-  toggleBookmark(articleId: number, userId: string): Promise<boolean>;
+  toggleLike(articleId: any, userId: string): Promise<boolean>;
+  toggleBookmark(articleId: any, userId: string): Promise<boolean>;
   toggleFollow(followerId: string, followingId: string): Promise<boolean>;
 
-  getArticleLikes(articleId: number): Promise<number>;
-  hasLiked(articleId: number, userId: string): Promise<boolean>;
-  hasBookmarked(articleId: number, userId: string): Promise<boolean>;
+  getArticleLikes(articleId: any): Promise<number>;
+  hasLiked(articleId: any, userId: string): Promise<boolean>;
+  hasBookmarked(articleId: any, userId: string): Promise<boolean>;
   getUserStats(userId: string): Promise<{ posts: number, followers: number, following: number }>;
 
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
-  getComments(articleId: number): Promise<(Comment & { author: User })[]>;
-  deleteComment(id: number): Promise<void>;
+  getComments(articleId: any): Promise<(Comment & { author: User })[]>;
+  deleteComment(id: any): Promise<void>;
 
   // Reports
-  createReport(articleId: number, reporterId: string, reason: string): Promise<void>;
+  createReport(articleId: any, reporterId: string, reason: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -654,4 +654,5 @@ export class FilePersistedStorage extends MemStorage {
 }
 
 // Use Firestore for all data storage
-export { storage } from './firestore-storage.js';
+import { storage as firestoreStorage } from './firestore-storage';
+export const storage = firestoreStorage;

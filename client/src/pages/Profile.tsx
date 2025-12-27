@@ -38,6 +38,11 @@ export default function Profile() {
   const { mutate: deleteArticle, isPending: isDeleting } = useDeleteArticle();
 
   if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
+  if (!currentUser) {
+    // Redirect to login if not authenticated
+    window.location.href = '/login';
+    return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
+  }
   if (!profileUser) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">User not found</div>;
 
   const isOwnProfile = currentUser?.id === profileUser.id;

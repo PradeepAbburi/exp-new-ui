@@ -48,7 +48,7 @@ export default function Home() {
   }), [users, searchQuery]);
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
-  // Removed: if (!user) return <LandingPage />; - Now showing articles to everyone
+  if (!user) return <LandingPage />; // Require signup/login to view content
   if (user && !user.isProfileComplete) return <Redirect to="/complete-profile" />;
 
   return (

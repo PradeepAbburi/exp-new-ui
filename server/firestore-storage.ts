@@ -176,12 +176,40 @@ export class FirestoreStorage implements IStorage {
         return { ...newArticle, createdAt: new Date(), updatedAt: new Date() } as Article;
     }
 
-    async getArticle(id: number): Promise<Article | undefined> {
-        const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
-        const snapshot = await getDocs(q);
+    async getArticle(id: any): Promise<Article | undefined> {
+        // Try fetching by document ID first (string IDs)
+        try {
+            const docRef = doc(db, 'articles', String(id));
+            const docSnap = await getDoc(docRef);
 
-        if (snapshot.empty) return undefined;
-        return convertTimestamp(snapshot.docs[0].data()) as Article;
+            if (docSnap.exists()) {
+                const data = convertTimestamp(docSnap.data());
+                // Remove numeric id field and use document ID
+                const { id: numericId, ...restData } = data as any;
+                return { ...restData, id: docSnap.id } as Article;
+            }
+        } catch (error) {
+            console.error('[Firestore] Error fetching article by document ID:', error);
+        }
+
+        // Fallback: Try to fetch by numeric ID
+        try {
+            const numericId = Number(id);
+            if (!isNaN(numericId)) {
+                const numericQuery = query(collection(db, 'articles'), where('id', '==', numericId), limit(1));
+                const numericSnapshot = await getDocs(numericQuery);
+
+                if (!numericSnapshot.empty) {
+                    const data = convertTimestamp(numericSnapshot.docs[0].data());
+                    const { id: _, ...restData } = data as any;
+                    return { ...restData, id: numericSnapshot.docs[0].id } as Article;
+                }
+            }
+        } catch (error) {
+            console.error('[Firestore] Error fetching article by numeric ID:', error);
+        }
+
+        return undefined;
     }
 
     async getArticles(view: string = 'public', userId?: string): Promise<(Article & { author: User, likeCount: number, isLiked: boolean, isBookmarked: boolean })[]> {
@@ -192,8 +220,15 @@ export class FirestoreStorage implements IStorage {
             const snapshot = await getDocs(collection(db, 'articles'));
             console.log(`[Firestore] Found ${snapshot.size} total articles in Firestore`);
 
-            // Get all articles and filter in memory
-            let articles = snapshot.docs.map(doc => convertTimestamp(doc.data()) as Article);
+            // Get all articles and filter in memory - use document ID as primary ID
+            let articles = snapshot.docs.map(doc => {
+                const data = convertTimestamp(doc.data());
+                // Create object without the old numeric id
+                const { id: numericId, ...restData } = data as any;
+
+                // Use Firestore document ID as the primary ID to ensure uniqueness
+                return { ...restData, id: String(doc.id) } as any;
+            });
 
             // Apply filters in memory
             if (view === 'public') {
@@ -243,7 +278,7 @@ export class FirestoreStorage implements IStorage {
         }
     }
 
-    async updateArticle(id: number, updates: Partial<InsertArticle>): Promise<Article> {
+    async updateArticle(id: any, updates: Partial<InsertArticle>): Promise<Article> {
         const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
         const snapshot = await getDocs(q);
         if (snapshot.empty) throw new Error('Article not found');
@@ -258,7 +293,7 @@ export class FirestoreStorage implements IStorage {
         return convertTimestamp(updated.data()) as Article;
     }
 
-    async deleteArticle(id: number): Promise<void> {
+    async deleteArticle(id: any): Promise<void> {
         const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
         const snapshot = await getDocs(q);
         if (!snapshot.empty) {
@@ -266,7 +301,7 @@ export class FirestoreStorage implements IStorage {
         }
     }
 
-    async incrementView(id: number): Promise<void> {
+    async incrementView(id: any): Promise<void> {
         const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
         const snapshot = await getDocs(q);
         if (!snapshot.empty) {
@@ -280,7 +315,7 @@ export class FirestoreStorage implements IStorage {
     // SOCIAL (Likes, Bookmarks, Follows)
     // ============================================
 
-    async toggleLike(articleId: number, userId: string): Promise<boolean> {
+    async toggleLike(articleId: any, userId: string): Promise<boolean> {
         const q = query(collection(db, 'likes'), where('articleId', '==', articleId), where('userId', '==', userId), limit(1));
         const snapshot = await getDocs(q);
 
@@ -293,7 +328,7 @@ export class FirestoreStorage implements IStorage {
         }
     }
 
-    async toggleBookmark(articleId: number, userId: string): Promise<boolean> {
+    async toggleBookmark(articleId: any, userId: string): Promise<boolean> {
         const q = query(collection(db, 'bookmarks'), where('articleId', '==', articleId), where('userId', '==', userId), limit(1));
         const snapshot = await getDocs(q);
 
@@ -319,19 +354,19 @@ export class FirestoreStorage implements IStorage {
         }
     }
 
-    async getArticleLikes(articleId: number): Promise<number> {
+    async getArticleLikes(articleId: any): Promise<number> {
         const q = query(collection(db, 'likes'), where('articleId', '==', articleId));
         const snapshot = await getDocs(q);
         return snapshot.size;
     }
 
-    async hasLiked(articleId: number, userId: string): Promise<boolean> {
+    async hasLiked(articleId: any, userId: string): Promise<boolean> {
         const q = query(collection(db, 'likes'), where('articleId', '==', articleId), where('userId', '==', userId), limit(1));
         const snapshot = await getDocs(q);
         return !snapshot.empty;
     }
 
-    async hasBookmarked(articleId: number, userId: string): Promise<boolean> {
+    async hasBookmarked(articleId: any, userId: string): Promise<boolean> {
         const q = query(collection(db, 'bookmarks'), where('articleId', '==', articleId), where('userId', '==', userId), limit(1));
         const snapshot = await getDocs(q);
         return !snapshot.empty;
@@ -362,7 +397,7 @@ export class FirestoreStorage implements IStorage {
         return { ...newComment, createdAt: new Date() } as Comment;
     }
 
-    async getComments(articleId: number): Promise<(Comment & { author: User })[]> {
+    async getComments(articleId: any): Promise<(Comment & { author: User })[]> {
         try {
             // Fetch all comments for this article without orderBy to avoid index
             const q = query(collection(db, 'comments'), where('articleId', '==', String(articleId)));
@@ -390,7 +425,7 @@ export class FirestoreStorage implements IStorage {
         }
     }
 
-    async deleteComment(id: number): Promise<void> {
+    async deleteComment(id: any): Promise<void> {
         const q = query(collection(db, 'comments'), where('id', '==', id), limit(1));
         const snapshot = await getDocs(q);
         if (!snapshot.empty) {
@@ -402,7 +437,7 @@ export class FirestoreStorage implements IStorage {
     // REPORTS
     // ============================================
 
-    async createReport(articleId: number, reporterId: string, reason: string): Promise<void> {
+    async createReport(articleId: any, reporterId: string, reason: string): Promise<void> {
         await addDoc(collection(db, 'reports'), {
             articleId,
             reporterId,
