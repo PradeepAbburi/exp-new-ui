@@ -47,20 +47,25 @@ export class FirestoreStorage implements IStorage {
     // ============================================
 
     async getUser(id: string): Promise<User | undefined> {
-        const docRef = doc(db, 'users', id);
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) return undefined;
+        try {
+            const docRef = doc(db, 'users', id);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return undefined;
 
-        const userData = docSnap.data();
-        // Normalize avatar field names (handle avatarUrl, avatar_url, profileImageUrl variations)
-        const normalizedUser = {
-            ...userData,
-            id: docSnap.id,
-            avatarUrl: userData.avatarUrl || userData.avatar_url || userData.profileImageUrl || null,
-            displayName: userData.displayName || userData.display_name || userData.username || null,
-        };
+            const userData = docSnap.data();
+            // Normalize avatar field names (handle avatarUrl, avatar_url, profileImageUrl variations)
+            const normalizedUser = {
+                ...userData,
+                id: docSnap.id,
+                avatarUrl: userData.avatarUrl || userData.avatar_url || userData.profileImageUrl || null,
+                displayName: userData.displayName || userData.display_name || userData.username || null,
+            };
 
-        return convertTimestamp(normalizedUser) as User;
+            return convertTimestamp(normalizedUser) as User;
+        } catch (error) {
+            console.error(`[Firestore] getUser(${id}) failed:`, error);
+            return undefined;
+        }
     }
 
     async getUserByUsername(username: string): Promise<User | undefined> {
