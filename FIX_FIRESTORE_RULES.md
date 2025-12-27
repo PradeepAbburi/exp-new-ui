@@ -14,26 +14,8 @@ This error is happening because your Firestore Security Rules are blocking your 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // User Profiles:
-    // - Anyone can read a user profile (needed for article authors)
-    // - Authenticated users can write only to their own profile
-    match /users/{userId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Articles:
-    // - Anyone can read articles
-    // - Only authenticated users can create/update articles
-    match /articles/{articleId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-    
-    // Default deny
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
     }
   }
 }
