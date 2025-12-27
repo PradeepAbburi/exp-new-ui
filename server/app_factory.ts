@@ -36,16 +36,10 @@ export async function setupApp() {
 
     // CORS Middleware
     app.use((req, res, next) => {
-        const allowedOrigins = [
-            'http://localhost:5000',
-            'https://expertene-ui.vercel.app',
-            'https://article-forge-rho.vercel.app',
-            'https://expertene.tech',
-            'https://www.expertene.tech'
-        ];
         const origin = req.headers.origin;
-        if (origin && allowedOrigins.includes(origin as string)) {
-            res.setHeader('Access-Control-Allow-Origin', origin as string);
+        // Allow any origin to support Vercel preview URLs
+        if (origin) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
         }
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,x-user-id');

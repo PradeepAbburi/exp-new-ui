@@ -14,9 +14,17 @@ const firebaseConfig = {
     measurementId: "G-0GQ6P1ML29",
 };
 
+import { getAuth, signInAnonymously } from 'firebase/auth';
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig, 'server-app');
 const db = getFirestore(app);
+
+// Authenticate anonymously to access collections protected by "auth != null" rules
+const auth = getAuth(app);
+signInAnonymously(auth)
+    .then(userCred => console.log('✅ Server signed in anonymously as:', userCred.user.uid))
+    .catch(err => console.error('❌ Server failed to sign in anonymously:', err));
 
 console.log('✅ Firestore initialized successfully for server');
 
