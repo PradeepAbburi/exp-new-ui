@@ -263,9 +263,16 @@ export class FirestoreStorage implements IStorage {
             // Enrich with author and social data
             const enriched = await Promise.all(articles.map(async (article) => {
                 const author = await this.getUser(article.authorId);
+                const safeAuthor = author || {
+                    id: article.authorId,
+                    username: 'unknown_user',
+                    displayName: 'Unknown User',
+                    avatarUrl: null,
+                    buyMeACoffeeUrl: null
+                } as User;
+
                 if (!author) {
-                    console.log(`[Firestore] Skipping article ${article.id} - author ${article.authorId} not found`);
-                    return null;
+                    console.log(`[Firestore] Author ${article.authorId} not found for article ${article.id}, using fallback`);
                 }
 
                 const likeCount = await this.getArticleLikes(article.id);
@@ -275,7 +282,7 @@ export class FirestoreStorage implements IStorage {
                 // Filter for bookmarks view
                 if (view === 'bookmarks' && !isBookmarked) return null;
 
-                return { ...article, author, likeCount, isLiked, isBookmarked };
+                return { ...article, author: safeAuthor, likeCount, isLiked, isBookmarked };
             }));
 
             const result = enriched.filter(Boolean) as (Article & { author: User, likeCount: number, isLiked: boolean, isBookmarked: boolean })[];
