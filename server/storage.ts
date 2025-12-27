@@ -353,6 +353,7 @@ export class MemStorage implements IStorage {
       displayName: null,
       avatarUrl: null,
       bannerUrl: null,
+      buyMeACoffeeUrl: null,
     };
     this.users.set(id, user);
     return user;
@@ -388,6 +389,7 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       updatedAt: new Date(),
       isPublic: article.isPublic ?? true,
+      isArchived: article.isArchived ?? false,
       coverImage: article.coverImage ?? null,
       accessKey: article.accessKey ?? null,
       views: 0,
