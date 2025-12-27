@@ -13,77 +13,100 @@ export async function registerRoutes(
 
   // Utility to hydrate user from headers
   const hydrateUserFromHeaders = async (req: any) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) return null;
+    try {
+      const userId = req.headers['x-user-id'];
+      if (!userId) return null;
 
-    req.user = { claims: { sub: userId } };
+      req.user = { claims: { sub: userId } };
 
-    // Ensure user exists in Postgres (sync on demand)
-    const user = await storage.getUser(String(userId));
-    if (!user) {
-      // Hydrate from headers if available
-      const displayName = req.headers['x-user-name'] ? String(req.headers['x-user-name']) : undefined;
-      const email = req.headers['x-user-email'] ? String(req.headers['x-user-email']) : undefined;
-      const avatarUrl = req.headers['x-user-avatar'] ? String(req.headers['x-user-avatar']) : undefined;
-      let username = req.headers['x-user-username'] ? String(req.headers['x-user-username']).toLowerCase() :
-        (email ? email.split('@')[0].toLowerCase() : "user_" + String(userId).substring(0, 6));
+      // Ensure user exists (sync on demand)
+      // We wrap DB calls in try-catch to handle permission issues or outages gracefully
+      try {
+        const user = await storage.getUser(String(userId));
+        if (!user) {
+          // Hydrate from headers if available
+          const displayName = req.headers['x-user-name'] ? String(req.headers['x-user-name']) : undefined;
+          const email = req.headers['x-user-email'] ? String(req.headers['x-user-email']) : undefined;
+          const avatarUrl = req.headers['x-user-avatar'] ? String(req.headers['x-user-avatar']) : undefined;
+          let username = req.headers['x-user-username'] ? String(req.headers['x-user-username']).toLowerCase() :
+            (email ? email.split('@')[0].toLowerCase() : "user_" + String(userId).substring(0, 6));
 
-      // Ensure username is unique
-      let isUnique = false;
-      let attempt = 0;
-      let finalUsername = username;
+          // Ensure username is unique
+          let isUnique = false;
+          let attempt = 0;
+          let finalUsername = username;
 
-      while (!isUnique && attempt < 5) {
-        if (attempt > 0) {
-          finalUsername = `${username}${Math.floor(Math.random() * 1000)}`;
-        }
-        const existing = await storage.getUserByUsername(finalUsername);
-        if (!existing) {
-          isUnique = true;
+          while (!isUnique && attempt < 5) {
+            if (attempt > 0) {
+              finalUsername = `${username}${Math.floor(Math.random() * 1000)}`;
+            }
+            const existing = await storage.getUserByUsername(finalUsername);
+            if (!existing) {
+              isUnique = true;
+            } else {
+              attempt++;
+            }
+          }
+
+          // Create user with real profile data
+          await storage.upsertUser({
+            id: String(userId),
+            username: finalUsername,
+            displayName: displayName,
+            email: email,
+            avatarUrl: avatarUrl,
+            isProfileComplete: true
+          });
         } else {
-          attempt++;
+          // Update existing user if headers contain richer info
+          const displayName = req.headers['x-user-name'] ? String(req.headers['x-user-name']) : undefined;
+          const avatarUrl = req.headers['x-user-avatar'] ? String(req.headers['x-user-avatar']) : undefined;
+
+          if (displayName || avatarUrl) {
+            const updates: any = {};
+            if (displayName && user.displayName !== displayName) updates.displayName = displayName;
+            if (avatarUrl && user.avatarUrl !== avatarUrl) updates.avatarUrl = avatarUrl;
+
+            if (Object.keys(updates).length > 0) {
+              await storage.updateUser(String(userId), updates);
+            }
+          }
         }
+      } catch (dbError) {
+        console.error('[hydrateUserFromHeaders] DB Error:', dbError);
+        // Do not rethrow, just continue so the request doesn't fail 500
       }
-
-      // Create user with real profile data
-      await storage.upsertUser({
-        id: String(userId),
-        username: finalUsername,
-        displayName: displayName,
-        email: email,
-        avatarUrl: avatarUrl,
-        isProfileComplete: true
-      });
-    } else {
-      // Update existing user if headers contain richer info
-      const displayName = req.headers['x-user-name'] ? String(req.headers['x-user-name']) : undefined;
-      const avatarUrl = req.headers['x-user-avatar'] ? String(req.headers['x-user-avatar']) : undefined;
-
-      if (displayName || avatarUrl) {
-        const updates: any = {};
-        if (displayName && user.displayName !== displayName) updates.displayName = displayName;
-        if (avatarUrl && user.avatarUrl !== avatarUrl) updates.avatarUrl = avatarUrl;
-
-        if (Object.keys(updates).length > 0) {
-          await storage.updateUser(String(userId), updates);
-        }
-      }
+      return userId;
+    } catch (e) {
+      console.error('[hydrateUserFromHeaders] Unexpected error:', e);
+      return null;
     }
-    return userId;
   };
 
   const requireAuth = async (req: any, res: any, next: any) => {
     if (req.isAuthenticated()) return next();
-    const userId = await hydrateUserFromHeaders(req);
-    if (userId) return next();
+    try {
+      const userId = await hydrateUserFromHeaders(req);
+      if (userId) return next();
+    } catch (e) {
+      console.error('[requireAuth] Error:', e);
+    }
     return res.status(401).json({ message: "Unauthorized" });
   };
 
   const optionalAuth = async (req: any, res: any, next: any) => {
     if (req.isAuthenticated()) return next();
-    await hydrateUserFromHeaders(req);
+    try {
+      await hydrateUserFromHeaders(req);
+    } catch (e) {
+      console.error('[optionalAuth] Error:', e);
+    }
     next();
   };
+
+
+
+
 
   // Auth
   await setupAuth(app);
