@@ -260,5 +260,73 @@ export async function registerRoutes(
     res.status(204).send();
   });
 
+  // Admin Routes
+  app.get("/api/admin/users", requireAuth, async (req: any, res) => {
+    const userId = req.user?.claims?.sub || req.user?.id;
+    console.log(`[Admin] Fetching users for admin user: ${userId}`);
+    const user = await storage.getUser(userId);
+    if (!user || user.email !== "admin@expertene.com") {
+      console.log(`[Admin] Forbidden: user email is ${user?.email}`);
+      return res.status(403).json({ message: "Forbidden: Admin access only" });
+    }
+    const users = await storage.getAllUsers();
+    console.log(`[Admin] Returning ${users.length} users. List: ${users.map(u => u.email).join(', ')}`);
+    res.json(users);
+  });
+
+  app.get("/api/admin/reports", requireAuth, async (req: any, res) => {
+    const userId = req.user?.claims?.sub || req.user?.id;
+    console.log(`[Admin] Fetching reports for admin user: ${userId}`);
+    const user = await storage.getUser(userId);
+    if (!user || user.email !== "admin@expertene.com") {
+      console.log(`[Admin] Forbidden reports access: user email is ${user?.email}`);
+      return res.status(403).json({ message: "Forbidden: Admin access only" });
+    }
+    const reports = await storage.getAllReports();
+    console.log(`[Admin] Returning ${reports.length} reports.`);
+    res.json(reports);
+  });
+
+  app.delete("/api/admin/users/:id", requireAuth, async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const user = await storage.getUser(userId);
+    if (!user || user.email !== "admin@expertene.com") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    await storage.deleteUser(req.params.id);
+    res.status(204).send();
+  });
+
+  app.delete("/api/admin/articles/:id", requireAuth, async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const user = await storage.getUser(userId);
+    if (!user || user.email !== "admin@expertene.com") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    await storage.deleteArticle(req.params.id as any);
+    res.status(204).send();
+  });
+
+  app.delete("/api/admin/reports/:id", requireAuth, async (req: any, res) => {
+    const userId = req.user?.claims?.sub || req.user?.id;
+    const user = await storage.getUser(userId);
+    if (!user || user.email !== "admin@expertene.com") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    await storage.deleteReport(req.params.id);
+    res.status(204).send();
+  });
+
+  app.patch("/api/admin/reports/:id/status", requireAuth, async (req: any, res) => {
+    const userId = req.user?.claims?.sub || req.user?.id;
+    const user = await storage.getUser(userId);
+    if (!user || user.email !== "admin@expertene.com") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    const { status } = req.body;
+    await storage.updateReportStatus(req.params.id, status);
+    res.json({ success: true });
+  });
+
   return httpServer;
 }

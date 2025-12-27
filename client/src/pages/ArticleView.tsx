@@ -415,6 +415,28 @@ export default function ArticleView() {
             {/* Comments Section */}
             <Comments articleId={article.id} />
 
+            {/* Buy Me a Coffee Section (Author or Platform) */}
+            <div className="my-12 p-8 rounded-3xl bg-gradient-to-br from-[#FFDD00]/20 to-[#FFDD00]/5 border border-[#FFDD00]/30 shadow-lg text-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:animate-shimmer" />
+              <h3 className="text-2xl font-display font-bold mb-3 text-foreground relative z-10">
+                {article.author.buyMeACoffeeUrl ? "Enjoyed the read?" : "Support Our Work"}
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto relative z-10">
+                {article.author.buyMeACoffeeUrl
+                  ? `If you found this article helpful, consider supporting ${article.author.displayName || article.author.username} with a coffee!`
+                  : "Help us keep the platform running and free for everyone. Your support means the world!"}
+              </p>
+              <a
+                href={article.author.buyMeACoffeeUrl || "https://buymeacoffee.com/PradeepAbburi"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-[#FFDD00] text-black font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-[#FFDD00]/20 hover:scale-105 active:scale-95 transition-all relative z-10"
+              >
+                <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="" className="w-6 h-6" />
+                <span>Buy me a coffee</span>
+              </a>
+            </div>
+
           </div>
         </div>
       </main>

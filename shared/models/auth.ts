@@ -26,6 +26,7 @@ export const users = pgTable("users", {
   bannerUrl: varchar("banner_url"), // Added for profile banners
   username: varchar("username").unique(),
   bio: text("bio"),
+  buyMeACoffeeUrl: varchar("buy_me_a_coffee_url"), // Added for appreciation
   password: text("password"), // For email/password auth (nullable for OAuth users)
   isProfileComplete: boolean("is_profile_complete").default(false),
   createdAt: timestamp("created_at").defaultNow(),

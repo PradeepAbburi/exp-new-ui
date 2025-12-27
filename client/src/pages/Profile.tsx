@@ -216,6 +216,20 @@ export default function Profile() {
                   <Calendar className="w-4 h-4" />
                   <span>Joined {profileUser.createdAt && format(new Date(profileUser.createdAt), 'MMMM yyyy')}</span>
                 </div>
+                {/* Buy Me a Coffee Link in Profile */}
+                {profileUser.buyMeACoffeeUrl && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <a
+                      href={profileUser.buyMeACoffeeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-[#FFDD00] hover:underline font-bold transition-all"
+                    >
+                      <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="" className="w-5 h-5" />
+                      <span>Support {profileUser.firstName || "me"}</span>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 

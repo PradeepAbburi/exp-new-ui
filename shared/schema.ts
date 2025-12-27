@@ -124,6 +124,7 @@ export interface ClientArticle {
     username: string;
     displayName?: string;
     avatarUrl?: string | null;
+    buyMeACoffeeUrl?: string | null;
   };
   likeCount?: number;
   isLiked?: boolean;

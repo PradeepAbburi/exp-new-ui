@@ -20,9 +20,11 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   updateUser(id: string, user: Partial<InsertUser>): Promise<User>;
   upsertUser(user: Partial<User> & { id: string }): Promise<User>;
   createLocalUser(email: string, username: string, passwordHash: string): Promise<User>;
+  deleteUser(id: string): Promise<void>;
 
   // Articles
   // Articles
@@ -50,6 +52,9 @@ export interface IStorage {
 
   // Reports
   createReport(articleId: any, reporterId: string, reason: string): Promise<void>;
+  getAllReports(): Promise<any[]>;
+  deleteReport(reportId: string): Promise<void>;
+  updateReportStatus(reportId: string, status: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -65,8 +70,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users);
   }
 
   async getUserStats(userId: string): Promise<{ posts: number, followers: number, following: number }> {
@@ -118,6 +127,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return updated;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async createArticle(article: InsertArticle): Promise<Article> {
@@ -265,7 +278,19 @@ export class DatabaseStorage implements IStorage {
 
   async createReport(articleId: number, reporterId: string, reason: string): Promise<void> {
     // Drizzle implementation would involve inserting into a 'reports' table
-    throw new Error("createReport not implemented in DatabaseStorage");
+    return;
+  }
+
+  async getAllReports(): Promise<any[]> {
+    return [];
+  }
+
+  async deleteReport(reportId: string): Promise<void> {
+    return;
+  }
+
+  async updateReportStatus(reportId: string, status: string): Promise<void> {
+    return;
   }
 
   async translateArticle(articleId: number, targetLanguage: string): Promise<Article> {
@@ -298,6 +323,10 @@ export class MemStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(u => u.email === email);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
   }
 
   async getUserStats(userId: string): Promise<{ posts: number, followers: number, following: number }> {
@@ -335,6 +364,11 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...updates } as User;
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    this.users.delete(id);
+    await this.save();
   }
 
   async upsertUser(user: Partial<User> & { id: string }): Promise<User> {
@@ -508,6 +542,24 @@ export class MemStorage implements IStorage {
   async createReport(articleId: number, reporterId: string, reason: string): Promise<void> {
     this.reports.push({ articleId, reporterId, reason, createdAt: new Date() });
     await this.save();
+  }
+
+  async getAllReports(): Promise<any[]> {
+    return this.reports;
+  }
+
+  async deleteReport(reportId: string): Promise<void> {
+    // Basic dismissal
+    this.reports = this.reports.filter((r: any) => String(r.id) !== String(reportId));
+    await this.save();
+  }
+
+  async updateReportStatus(reportId: string, status: string): Promise<void> {
+    const report = this.reports.find((r: any) => String(r.id) === String(reportId));
+    if (report) {
+      (report as any).status = status;
+      await this.save();
+    }
   }
 
   async translateArticle(articleId: number, targetLanguage: string): Promise<Article> {

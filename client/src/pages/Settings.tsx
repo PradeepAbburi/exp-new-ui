@@ -18,6 +18,7 @@ export default function Settings() {
         bio: user?.bio || "",
         avatarUrl: user?.avatarUrl || "",
         bannerUrl: user?.bannerUrl || "",
+        buyMeACoffeeUrl: user?.buyMeACoffeeUrl || "",
     });
 
     const [cropperOpen, setCropperOpen] = useState(false);
@@ -209,6 +210,19 @@ export default function Settings() {
                                             value={formData.bio}
                                             onChange={(e) => setFormData(p => ({ ...p, bio: e.target.value }))}
                                         />
+                                    </div>
+
+                                    <div className="col-span-full space-y-2">
+                                        <label className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Buy Me a Coffee Link</label>
+                                        <div className="relative">
+                                            <input
+                                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                placeholder="https://buymeacoffee.com/yourname"
+                                                value={formData.buyMeACoffeeUrl}
+                                                onChange={(e) => setFormData(p => ({ ...p, buyMeACoffeeUrl: e.target.value }))}
+                                            />
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">Add your link to receive appreciation from readers.</p>
                                     </div>
                                 </div>
                             </div>

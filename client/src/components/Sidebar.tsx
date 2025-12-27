@@ -6,6 +6,7 @@ import {
   User,
   LogOut,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import clsx from "clsx";
@@ -22,6 +23,10 @@ export function Sidebar() {
     { label: "Bookmarks", icon: Bookmark, href: "/bookmarks" },
     { label: "Settings", icon: Settings, href: "/account" }, // Updated to /account
   ];
+
+  if (user?.email === "admin@expertene.com") {
+    navItems.push({ label: "Admin", icon: ShieldCheck, href: "/admin" });
+  }
 
   // Mobile navigation - exclude Settings for cleaner layout
   const mobileNavItems = navItems.filter(item => item.label !== "Settings");

@@ -73,6 +73,11 @@ export class FirestoreStorage implements IStorage {
         return convertTimestamp({ id: docSnap.id, ...docSnap.data() }) as User;
     }
 
+    async getAllUsers(): Promise<User[]> {
+        const snapshot = await getDocs(collection(db, 'users'));
+        return snapshot.docs.map(doc => convertTimestamp({ id: doc.id, ...doc.data() })) as User[];
+    }
+
     async createLocalUser(email: string, username: string, passwordHash: string): Promise<User> {
         const userRef = doc(collection(db, 'users'));
         const user: any = {
@@ -105,6 +110,10 @@ export class FirestoreStorage implements IStorage {
 
         const updated = await getDoc(userRef);
         return convertTimestamp({ id: updated.id, ...updated.data() }) as User;
+    }
+
+    async deleteUser(id: string): Promise<void> {
+        await deleteDoc(doc(db, 'users', id));
     }
 
     async upsertUser(user: Partial<User> & { id: string }): Promise<User> {
@@ -442,8 +451,22 @@ export class FirestoreStorage implements IStorage {
             articleId,
             reporterId,
             reason,
+            status: 'pending',
             createdAt: serverTimestamp()
         });
+    }
+
+    async getAllReports(): Promise<any[]> {
+        const snapshot = await getDocs(collection(db, 'reports'));
+        return snapshot.docs.map(doc => convertTimestamp({ id: doc.id, ...doc.data() }));
+    }
+
+    async updateReportStatus(reportId: string, status: string): Promise<void> {
+        await updateDoc(doc(db, 'reports', reportId), { status });
+    }
+
+    async deleteReport(reportId: string): Promise<void> {
+        await deleteDoc(doc(db, 'reports', reportId));
     }
 }
 

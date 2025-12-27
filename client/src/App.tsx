@@ -18,6 +18,7 @@ import Account from "@/pages/Account";
 import Analytics from "@/pages/Analytics";
 import Bin from "@/pages/Bin";
 import EmailAction from "@/pages/EmailAction";
+import Admin from "@/pages/Admin";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/analytics" component={Analytics} />
       <Route path="/bin" component={Bin} />
       <Route path="/profile/:username" component={Profile} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
