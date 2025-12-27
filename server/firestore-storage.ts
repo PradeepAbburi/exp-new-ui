@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, increment, serverTimestamp, Timestamp, addDoc, QuerySnapshot, DocumentData } from 'firebase/firestore';
-import { IStorage } from './storage.js';
+import { IStorage } from './storage-interfaces';
 import { type User, type Article, type InsertArticle, type InsertUser, type InsertComment, type Comment } from '@shared/schema';
 
 // Firebase configuration (same as client)
