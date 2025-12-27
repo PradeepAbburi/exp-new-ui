@@ -707,6 +707,4 @@ export class FilePersistedStorage extends MemStorage {
   }
 }
 
-// Use Firestore for all data storage
-import { storage as firestoreStorage } from './firestore-storage';
-export const storage = firestoreStorage;
+
