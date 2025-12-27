@@ -57,6 +57,12 @@ export async function setupApp() {
             return;
         }
 
+        // Content Security Policy
+        res.setHeader(
+            'Content-Security-Policy',
+            "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        );
+
         next();
     });
 
