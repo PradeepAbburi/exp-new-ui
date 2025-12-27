@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApp } from 'firebase/app';
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, increment, serverTimestamp, Timestamp, addDoc, QuerySnapshot, DocumentData } from 'firebase/firestore';
 import { IStorage } from './storage-interfaces';
 import { type User, type Article, type InsertArticle, type InsertUser, type InsertComment, type Comment } from '@shared/schema';
@@ -16,17 +16,31 @@ const firebaseConfig = {
 
 import { getAuth, signInAnonymously } from 'firebase/auth';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig, 'server-app');
-const db = getFirestore(app);
+// Initialize Firebase with robustness
+let app;
+let db: any;
+let auth;
 
-// Authenticate anonymously to access collections protected by "auth != null" rules
-const auth = getAuth(app);
-signInAnonymously(auth)
-    .then(userCred => console.log('✅ Server signed in anonymously as:', userCred.user.uid))
-    .catch(err => console.error('❌ Server failed to sign in anonymously:', err));
+try {
+    try {
+        app = getApp('server-app');
+    } catch {
+        app = initializeApp(firebaseConfig, 'server-app');
+    }
 
-console.log('✅ Firestore initialized successfully for server');
+    db = getFirestore(app);
+
+    // Authenticate anonymously to access collections protected by "auth != null" rules
+    auth = getAuth(app);
+    signInAnonymously(auth)
+        .then(userCred => console.log('✅ Server signed in anonymously as:', userCred.user.uid))
+        .catch(err => console.error('❌ Server failed to sign in anonymously:', err));
+
+    console.log('✅ Firestore initialized successfully for server');
+} catch (error) {
+    console.error("❌ CRITICAL: Failed to initialize Firebase:", error);
+    // We do not rethrow so the server can verify routes and show health check
+}
 
 // Helper to convert Firestore timestamps to Date
 function convertTimestamp(data: any): any {
