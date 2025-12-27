@@ -34,32 +34,15 @@ export async function setupApp() {
     );
     app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-    const corsCallback = (req: any, callback: any) => {
+    // CORS Middleware
+    app.use((req, res, next) => {
         const allowedOrigins = [
             'http://localhost:5000',
             'https://expertene-ui.vercel.app',
             'https://article-forge-rho.vercel.app',
-            // Add any other vercel domains here
+            'https://expertene.tech',
+            'https://www.expertene.tech'
         ];
-        const origin = req.header('Origin');
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, { origin: true, credentials: true });
-        } else {
-            callback(null, { origin: false });
-        }
-    };
-
-    // We need to import cors dynamically or use require because it might not be a top-level import in this file previously
-    // But better to add it as import at the top. 
-    // Since I cannot change imports easily with this replace block if they are far away, I will assume I can just use app.use directly if I had imported it.
-    // Wait, I need to add import. I'll use a separate edit for import or just use require if safe. 
-    // Let's rely on adding the import in a previous step or just use a simple middleware for now?
-    // No, standard cors package is better.
-    // I will add the import to the top of the file in a separate replace call if needed, or assume I can rewrite the whole file for safety?
-    // Actually, I'll just add a manual CORS middleware for simplicity and robustness without external deps issues in this specific file scope.
-
-    app.use((req, res, next) => {
-        const allowedOrigins = ['http://localhost:5000', 'https://expertene-ui.vercel.app', 'https://article-forge-rho.vercel.app'];
         const origin = req.headers.origin;
         if (origin && allowedOrigins.includes(origin as string)) {
             res.setHeader('Access-Control-Allow-Origin', origin as string);
@@ -67,6 +50,13 @@ export async function setupApp() {
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,x-user-id');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+        // Handle preflight requests
+        if (req.method === 'OPTIONS') {
+            res.sendStatus(200);
+            return;
+        }
+
         next();
     });
 
