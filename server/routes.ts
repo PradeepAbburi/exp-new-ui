@@ -25,13 +25,30 @@ export async function registerRoutes(
       const displayName = req.headers['x-user-name'] ? String(req.headers['x-user-name']) : undefined;
       const email = req.headers['x-user-email'] ? String(req.headers['x-user-email']) : undefined;
       const avatarUrl = req.headers['x-user-avatar'] ? String(req.headers['x-user-avatar']) : undefined;
-      const username = req.headers['x-user-username'] ? String(req.headers['x-user-username']) :
-        (email ? email.split('@')[0] : "user_" + String(userId).substring(0, 6));
+      let username = req.headers['x-user-username'] ? String(req.headers['x-user-username']).toLowerCase() :
+        (email ? email.split('@')[0].toLowerCase() : "user_" + String(userId).substring(0, 6));
+
+      // Ensure username is unique
+      let isUnique = false;
+      let attempt = 0;
+      let finalUsername = username;
+
+      while (!isUnique && attempt < 5) {
+        if (attempt > 0) {
+          finalUsername = `${username}${Math.floor(Math.random() * 1000)}`;
+        }
+        const existing = await storage.getUserByUsername(finalUsername);
+        if (!existing) {
+          isUnique = true;
+        } else {
+          attempt++;
+        }
+      }
 
       // Create user with real profile data
       await storage.upsertUser({
         id: String(userId),
-        username: username,
+        username: finalUsername,
         displayName: displayName,
         email: email,
         avatarUrl: avatarUrl,
