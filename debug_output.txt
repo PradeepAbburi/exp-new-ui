@@ -1,10 +1,12 @@
-Loaded storage from file (sync).
-Calling getArticles('public')...
-[Storage] getArticles: total=1, view=public, userId=undefined
-[Storage] getArticles: public filter reduced to 0
-[Storage] getArticles: final count=0
-Result length: 0
-No articles returned.
-Raw articles map size: 1
-Article ID 1: isPublic=false, authorId=w51sntkXP0UQAyVBD6iZ0fT4kxh2
-  Author lookup result: user_w51snt
+C:\Users\dines\Downloads\Article-Forge\server\db.ts:8
+  throw new Error(
+        ^
+
+
+Error: DATABASE_URL must be set. Did you forget to provision a database?
+    at <anonymous> (C:\Users\dines\Downloads\Article-Forge\server\db.ts:8:9)
+    at ModuleJob.run (node:internal/modules/esm/module_job:345:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:651:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.19.0

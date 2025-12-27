@@ -1,4 +1,4 @@
-import { storage as mainStorage } from "../../storage";
+import { storage as mainStorage } from "../../firestore-storage";
 import { type User, type UpsertUser } from "@shared/models/auth";
 
 export interface IAuthStorage {

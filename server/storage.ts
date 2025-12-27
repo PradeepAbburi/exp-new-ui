@@ -14,6 +14,8 @@ import {
   type Comment
 } from "@shared/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
+import fs from 'fs-extra';
+import path from 'path';
 
 export interface IStorage {
   // Users
@@ -581,8 +583,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-import fs from 'fs-extra';
-import path from 'path';
+// Imports moved to top
 
 // ... (MemStorage implementation)
 
@@ -705,6 +706,11 @@ export class FilePersistedStorage extends MemStorage {
     await super.deleteComment(id);
     await this.save();
   }
+
 }
+
+
+// Ensure this file is saved and export is visible
+export const storage = new FilePersistedStorage();
 
 
