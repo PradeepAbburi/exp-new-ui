@@ -20,7 +20,10 @@ export const users = pgTable("users", {
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  displayName: varchar("display_name"),
   profileImageUrl: varchar("profile_image_url"),
+  avatarUrl: varchar("avatar_url"), // Added for Firebase compatibility
+  bannerUrl: varchar("banner_url"), // Added for profile banners
   username: varchar("username").unique(),
   bio: text("bio"),
   password: text("password"), // For email/password auth (nullable for OAuth users)

@@ -70,7 +70,7 @@ export const api = {
     create: {
       method: 'POST' as const,
       path: '/api/articles',
-      input: insertArticleSchema,
+      input: insertArticleSchema.omit({ authorId: true }),
       responses: {
         201: z.custom<typeof articles.$inferSelect>(),
         400: errorSchemas.validation,
@@ -104,6 +104,60 @@ export const api = {
       path: '/api/articles/:id/bookmark',
       responses: {
         200: z.object({ success: z.boolean() }),
+      },
+    },
+    view: {
+      method: 'POST' as const,
+      path: '/api/articles/:id/view',
+      responses: {
+        200: z.void(),
+      },
+    },
+    translate: {
+      method: 'POST' as const,
+      path: '/api/articles/:id/translate',
+      input: z.object({
+        targetLanguage: z.string(),
+      }),
+      responses: {
+        200: z.object({ translatedContent: z.array(z.any()) }),
+      },
+    },
+    report: {
+      method: 'POST' as const,
+      path: '/api/articles/:id/report',
+      input: z.object({
+        reason: z.string(),
+      }),
+      responses: {
+        200: z.object({ success: z.boolean() }),
+      },
+    },
+  },
+  comments: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/articles/:articleId/comments',
+      responses: {
+        200: z.array(z.custom<any>()), // Simplification to avoid circular imports or complex schema replication
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/articles/:articleId/comments',
+      input: z.object({
+        content: z.string().min(1),
+        parentId: z.number().optional(),
+      }),
+      responses: {
+        201: z.custom<any>(),
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/comments/:id',
+      responses: {
+        204: z.void(),
       },
     },
   },

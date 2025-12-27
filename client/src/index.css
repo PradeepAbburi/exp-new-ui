@@ -6,11 +6,11 @@
 
 :root {
   /* Dark Theme Base - #202020 is approx HSL(0, 0%, 12.5%) */
-  --background: 0 0% 13%; 
+  --background: 0 0% 13%;
   --foreground: 0 0% 98%;
 
-  /* Teal Accent */
-  --primary: 174 100% 29%;
+  /* Blue Theme (Logo Color) */
+  --primary: 221 83% 53%;
   --primary-foreground: 0 0% 100%;
 
   /* Secondary / Card Surfaces */
@@ -26,7 +26,7 @@
   --muted: 0 0% 20%;
   --muted-foreground: 0 0% 65%;
 
-  --accent: 174 90% 25%;
+  --accent: 221 80% 45%;
   --accent-foreground: 0 0% 98%;
 
   --destructive: 0 62.8% 30.6%;
@@ -34,7 +34,7 @@
 
   --border: 0 0% 25%;
   --input: 0 0% 25%;
-  --ring: 174 100% 29%;
+  --ring: 221 83% 53%;
 
   --radius: 0.75rem;
 
@@ -47,12 +47,18 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground antialiased font-body;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display font-bold tracking-tight text-white;
   }
 }
@@ -61,7 +67,7 @@
   .glass-panel {
     @apply bg-card/80 backdrop-blur-md border border-white/5 shadow-xl;
   }
-  
+
   .input-field {
     @apply flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200;
   }
@@ -75,13 +81,16 @@
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--muted));
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }

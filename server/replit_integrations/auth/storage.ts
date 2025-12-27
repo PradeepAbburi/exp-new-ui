@@ -1,9 +1,6 @@
-import { users, type User, type UpsertUser } from "@shared/models/auth";
-import { db } from "../../db";
-import { eq } from "drizzle-orm";
+import { storage as mainStorage } from "../../storage";
+import { type User, type UpsertUser } from "@shared/models/auth";
 
-// Interface for auth storage operations
-// (IMPORTANT) These user operations are mandatory for Replit Auth.
 export interface IAuthStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
@@ -11,48 +8,5 @@ export interface IAuthStorage {
   createLocalUser(email: string, username: string, passwordHash: string): Promise<User>;
 }
 
-class AuthStorage implements IAuthStorage {
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
-  }
-
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
-  }
-
-  async createLocalUser(
-    email: string,
-    username: string,
-    passwordHash: string
-  ): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values({
-        email,
-        username,
-        password: passwordHash,
-        isProfileComplete: false,
-      })
-      .returning();
-    return user;
-  }
-}
-
-export const authStorage = new AuthStorage();
+// Ensure mainStorage satisfies IAuthStorage or close enough
+export const authStorage: IAuthStorage = mainStorage as unknown as IAuthStorage;

@@ -1,0 +1,52 @@
+🔍 Checking Firestore data...
+
+📁 users: 2 documents
+   1. ID: 9ocjSWusroXzt2vtabIEAnKccJI3
+      Username: pradeepabburi
+      Email: dineshkrishnapradeep@gmail.com
+   2. ID: w51sntkXP0UQAyVBD6iZ0fT4kxh2
+      Username: luffy
+      Email: piolamoon@gmail.com
+
+📁 articles: 3 documents
+   1. ID: 0dXc4scVLImc1NugqHo4
+      Title: jbzdkjdbdv
+      Author: w51sntkXP0UQAyVBD6iZ0fT4kxh2
+      Public: true
+      Archived: false
+      Has ID field: true
+   2. ID: Qro6qAMTFdqkaJ5b8Ywp
+      Title: new page
+      Author: 9ocjSWusroXzt2vtabIEAnKccJI3
+      Public: false
+      Archived: undefined
+      Has ID field: false
+   3. ID: nVGOUsiNnVwCl0ZHqNg0
+      Title: hdbakhb
+      Author: w51sntkXP0UQAyVBD6iZ0fT4kxh2
+      Public: false
+      Archived: false
+      Has ID field: false
+
+📁 likes: 0 documents
+
+📁 bookmarks: 2 documents
+   1. ID: 9ocjSWusroXzt2vtabIEAnKccJI3_0VjKoFlj4einrL4RM8xB
+   2. ID: 9ocjSWusroXzt2vtabIEAnKccJI3_Qro6qAMTFdqkaJ5b8Ywp
+
+📁 follows: 2 documents
+   1. ID: 9ocjSWusroXzt2vtabIEAnKccJI3_w51sntkXP0UQAyVBD6iZ0fT4kxh2
+   2. ID: w51sntkXP0UQAyVBD6iZ0fT4kxh2_9ocjSWusroXzt2vtabIEAnKccJI3
+
+📁 comments: 10 documents
+   1. ID: 0S6mpsieqDY3FWVabyyR
+   2. ID: 2fV0Kj87O4v0JBwBwfNf
+   3. ID: R4z0ua7LosjEJGEWq7U1
+   4. ID: RCv5IVqbsf24u3RMMB2f
+   5. ID: Y8fhyjtglJLrFrdMfig2
+   6. ID: YR85WGdySH6si7VSpqm7
+   7. ID: kaQcZ6K3YsEhK7P0mQIE
+   8. ID: o4hrCRkBMRhojYTA4ECx
+   9. ID: wZea1avjL4PboUuPe4kE
+   10. ID: yYOGnlcLBZ4o8c912ICo
+

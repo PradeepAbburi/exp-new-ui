@@ -14,7 +14,7 @@ export default {
         background: "hsl(0 0% 13%)", // #202020
         foreground: "hsl(0 0% 100%)",
         primary: {
-          DEFAULT: "hsl(174 100% 29%)", // Teal
+          DEFAULT: "hsl(189 100% 35%)", // #0097B2
           foreground: "hsl(0 0% 100%)",
         },
         card: {
@@ -27,7 +27,7 @@ export default {
           foreground: "hsl(0 0% 60%)",
         },
         input: "hsl(0 0% 25%)",
-        ring: "hsl(174 100% 29%)",
+        ring: "hsl(189 100% 35%)",
         popover: {
           DEFAULT: "hsl(0 0% 16%)",
           foreground: "hsl(0 0% 100%)",
@@ -36,14 +36,7 @@ export default {
           DEFAULT: "hsl(0 0% 20%)",
           foreground: "hsl(0 0% 100%)",
         },
-        accent: {
-          DEFAULT: "hsl(0 0% 20%)",
-          foreground: "hsl(0 0% 100%)",
-        },
-        destructive: {
-          DEFAULT: "hsl(0 62% 30%)",
-          foreground: "hsl(0 0% 100%)",
-        },
+
         // Flat / base colors (regular buttons)
         accent: {
           DEFAULT: "hsl(var(--accent) / <alpha-value>)",
@@ -55,7 +48,7 @@ export default {
           foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
           border: "var(--destructive-border)",
         },
-        ring: "hsl(var(--ring) / <alpha-value>)",
+
         chart: {
           "1": "hsl(var(--chart-1) / <alpha-value>)",
           "2": "hsl(var(--chart-2) / <alpha-value>)",

@@ -1,0 +1,11 @@
+{
+  "users": [],
+  "articles": [],
+  "likes": [],
+  "bookmarks": [],
+  "comments": [],
+  "follows": [],
+  "reports": [],
+  "articleIdCounter": 1,
+  "commentIdCounter": 1
+}
