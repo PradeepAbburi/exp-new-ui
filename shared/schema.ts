@@ -2,10 +2,10 @@ import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar } fr
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { users } from "./models/auth";
+import { users } from "./models/auth.js";
 
 
-export * from "./models/auth";
+export * from "./models/auth.js";
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
