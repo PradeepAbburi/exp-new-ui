@@ -5,7 +5,7 @@ import {
     type InsertUser,
     type InsertComment,
     type Comment
-} from "@shared/schema";
+} from "../shared/schema.js";
 
 export interface IStorage {
     // Users
