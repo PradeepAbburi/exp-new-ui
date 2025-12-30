@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Upload, X, Plus, Image as ImageIcon, FileText, Code as CodeIcon, Type, ArrowUp, ArrowDown, GripVertical, CheckSquare, Minus, MonitorPlay, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Strikethrough, Heading, List, Quote, Columns, PanelLeft, PanelRight, Link as LinkIcon, Code2 } from "lucide-react";
+import { Upload, X, Plus, Image as ImageIcon, FileText, Code as CodeIcon, Type, ArrowUp, ArrowDown, GripVertical, CheckSquare, Minus, MonitorPlay, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Strikethrough, Heading, List, Quote, Columns, PanelLeft, PanelRight, Link as LinkIcon, Code2, Table as TableIcon, Trash2 as Trash } from "lucide-react";
 import { useUpload } from "@/hooks/use-upload";
 import clsx from "clsx";
 import { ImageCropper } from "./ImageCropper";
 
 // Types matching DB jsonb structure
-export type BlockType = 'text' | 'media' | 'code' | 'document' | 'divider';
+export type BlockType = 'text' | 'media' | 'code' | 'document' | 'divider' | 'table';
 
 export interface Block {
   id: string;
@@ -56,8 +56,11 @@ export function Editor({ initialBlocks, onChange, onCoverImageChange, coverImage
       id: Math.random().toString(36).substr(2, 9),
       type,
       content: '',
-      attrs: { width: 100, align: 'center', layout: 'center', splitRatio: 50 }
+      attrs: { width: 100, align: 'center', layout: 'center', splitRatio: 50, withHeader: false }
     };
+    if (type === 'table') {
+      newBlock.content = { rows: [['', ''], ['', '']] };
+    }
     const newBlocks = [...blocks];
     newBlocks.splice(index, 0, newBlock);
     setBlocks(newBlocks);
@@ -300,6 +303,7 @@ export function Editor({ initialBlocks, onChange, onCoverImageChange, coverImage
           <AddBlockBtn icon={MonitorPlay} label="Media" onClick={() => addBlock('media')} />
           <AddBlockBtn icon={CodeIcon} label="Code" onClick={() => addBlock('code')} />
           <AddBlockBtn icon={FileText} label="Document" onClick={() => addBlock('document')} />
+          <AddBlockBtn icon={TableIcon} label="Table" onClick={() => addBlock('table')} />
           <AddBlockBtn icon={Minus} label="Divider" onClick={() => addBlock('divider')} />
         </div>
       </div>
@@ -687,6 +691,86 @@ function BlockEditor({
               <X className="w-4 h-4" />
             </button>
           )}
+        </div>
+      );
+    case 'table':
+      const rows = (block.content?.rows || [['', '']]) as string[][];
+      const withHeader = block.attrs?.withHeader || false;
+
+      const updateCell = (rowIndex: number, colIndex: number, val: string) => {
+        const newRows = [...rows.map(r => [...r])];
+        newRows[rowIndex][colIndex] = val;
+        onChange({ content: { rows: newRows } });
+      };
+
+      const addRow = () => {
+        const cols = rows[0].length;
+        onChange({ content: { rows: [...rows, Array(cols).fill('')] } });
+      };
+
+      const addCol = () => {
+        // Create new rows array where each row has one more empty string
+        const newRows = rows.map(r => [...r, '']);
+        onChange({ content: { rows: newRows } });
+      };
+
+      const removeRow = (index: number) => {
+        if (rows.length <= 1) return;
+        const newRows = rows.filter((_, i) => i !== index);
+        onChange({ content: { rows: newRows } });
+      };
+
+      const removeCol = (index: number) => {
+        if (rows[0].length <= 1) return;
+        const newRows = rows.map(r => r.filter((_, i) => i !== index));
+        onChange({ content: { rows: newRows } });
+      };
+
+      return (
+        <div className="rounded-xl border border-border p-4 bg-card/50 overflow-x-auto">
+          <div className="flex items-center gap-2 mb-4">
+            <button onClick={addRow} className="text-xs flex items-center gap-1 px-2 py-1 bg-secondary rounded hover:text-primary"><Plus className="w-3 h-3" /> Row</button>
+            <button onClick={addCol} className="text-xs flex items-center gap-1 px-2 py-1 bg-secondary rounded hover:text-primary"><Plus className="w-3 h-3" /> Col</button>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground ml-auto cursor-pointer">
+              <input
+                type="checkbox"
+                checked={withHeader}
+                onChange={(e) => onChange({ attrs: { ...block.attrs, withHeader: e.target.checked } })}
+                className="rounded border-border"
+              />
+              Header Row
+            </label>
+          </div>
+
+          <table className="w-full border-collapse">
+            <tbody>
+              {rows.map((row, rowIndex) => (
+                <tr key={rowIndex} className="border-b border-border/50 last:border-0 group/row">
+                  {row.map((cell, colIndex) => (
+                    <td key={`${rowIndex}-${colIndex}`} className={clsx("p-0 relative border-r border-border/50 last:border-0 group/cell", rowIndex === 0 && withHeader && "bg-muted/30 font-bold")}>
+                      <input
+                        value={cell}
+                        onChange={(e) => updateCell(rowIndex, colIndex, e.target.value)}
+                        className="w-full bg-transparent px-3 py-2 outline-none text-sm min-w-[100px]"
+                        placeholder={rowIndex === 0 && withHeader ? "Header" : ""}
+                      />
+                      {/* Column controls - show on hover of the cell area */}
+                      <button
+                        onClick={() => removeCol(colIndex)}
+                        className="absolute -top-2 right-0 opacity-0 group-hover/cell:opacity-100 p-0.5 bg-destructive/80 hover:bg-destructive text-white rounded transition-opacity z-10 scale-75"
+                        title="Remove Column"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </td>
+                  ))}
+                  <td className="w-8 sticky right-0 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                    <button onClick={() => removeRow(rowIndex)} className="p-1 hover:text-destructive text-muted-foreground"><Trash className="w-4 h-4" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       );
     default:

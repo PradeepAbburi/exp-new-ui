@@ -372,6 +372,27 @@ export default function ArticleView() {
                       </div>
                     </a>
                   )}
+                  {block.type === 'table' && block.content && (
+                    <div className="my-8 overflow-x-auto rounded-xl border border-border bg-card/30">
+                      <table className="w-full text-sm text-left">
+                        <tbody>
+                          {(block.content.rows || []).map((row: string[], i: number) => (
+                            <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-muted/20 transition-colors">
+                              {row.map((cell: string, j: number) => {
+                                const isHeader = i === 0 && block.attrs?.withHeader;
+                                const CellTag = isHeader ? 'th' : 'td';
+                                return (
+                                  <CellTag key={j} className={clsx("p-4 align-top", isHeader ? "bg-muted/50 font-bold" : "")}>
+                                    {cell}
+                                  </CellTag>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               ))}
             </article>
