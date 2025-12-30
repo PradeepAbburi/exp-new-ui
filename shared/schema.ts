@@ -25,7 +25,9 @@ export const articles = pgTable("articles", {
   views: integer("views").default(0),
 });
 
-export const insertArticleSchema = createInsertSchema(articles).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertArticleSchema = createInsertSchema(articles).omit({ id: true, createdAt: true, updatedAt: true }).passthrough().extend({
+  coverImage: z.string().nullable().optional()
+});
 
 // === SOCIAL ===
 export const likes = pgTable("likes", {
