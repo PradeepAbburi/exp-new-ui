@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { type User, type Article, type InsertArticle, type InsertUser, type InsertComment, type Comment } from '../shared/schema.js';
 import { storage } from "./firestore-storage.js";
-import { api, errorSchemas } from "@shared/routes";
+import { api, errorSchemas } from "../shared/routes.js";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth/index.js";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage/index.js";

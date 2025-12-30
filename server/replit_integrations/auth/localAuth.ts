@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import { authStorage } from "./storage.js";
-import type { User } from "@shared/models/auth";
+import type { User } from "../../../shared/models/auth.js";
 
 export function setupLocalAuth() {
   passport.use(
