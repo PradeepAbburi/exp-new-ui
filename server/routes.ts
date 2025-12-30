@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./firestore-storage";
+import { storage } from "./firestore-storage.js";
 import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
-import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
-import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth/index.js";
+import { registerObjectStorageRoutes } from "./replit_integrations/object_storage/index.js";
 
 export async function registerRoutes(
   httpServer: Server,
