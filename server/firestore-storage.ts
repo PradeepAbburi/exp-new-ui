@@ -354,7 +354,26 @@ export class FirestoreStorage implements IStorage {
 
     async updateArticle(id: any, updates: Partial<InsertArticle>): Promise<Article> {
         await this.ready;
-        const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
+
+        // Try to update by Document ID first (standard path)
+        try {
+            const docRef = doc(db, 'articles', String(id));
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                await updateDoc(docRef, {
+                    ...updates,
+                    updatedAt: serverTimestamp()
+                });
+                const updated = await getDoc(docRef);
+                return convertTimestamp({ ...updated.data(), id: updated.id }) as Article;
+            }
+        } catch (e) {
+            console.log(`[Firestore] Update by Doc ID failed, trying numeric ID fallback for ${id}`);
+        }
+
+        // Fallback: Query by numeric 'id' field
+        const q = query(collection(db, 'articles'), where('id', '==', Number(id)), limit(1));
         const snapshot = await getDocs(q);
         if (snapshot.empty) throw new Error('Article not found');
 
@@ -365,12 +384,31 @@ export class FirestoreStorage implements IStorage {
         });
 
         const updated = await getDoc(docRef);
-        return convertTimestamp(updated.data()) as Article;
+        // Use doc.id to be consistent with getArticles
+        const data = convertTimestamp(updated.data());
+        const { id: _, ...rest } = data as any;
+        return { ...rest, id: updated.id } as Article;
     }
 
     async deleteArticle(id: any): Promise<void> {
         await this.ready;
-        const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
+
+        // Try by Document ID first
+        try {
+            const docRef = doc(db, 'articles', String(id));
+            // Check if exists before deleting to handle legacy numeric ID fallback gracefully?
+            // Actually deleteDoc doesn't throw if not exists, but we want to ensure we target the right thing.
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                await deleteDoc(docRef);
+                return;
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        // Fallback by numeric ID
+        const q = query(collection(db, 'articles'), where('id', '==', Number(id)), limit(1));
         const snapshot = await getDocs(q);
         if (!snapshot.empty) {
             await deleteDoc(snapshot.docs[0].ref);
@@ -379,7 +417,19 @@ export class FirestoreStorage implements IStorage {
 
     async incrementView(id: any): Promise<void> {
         await this.ready;
-        const q = query(collection(db, 'articles'), where('id', '==', id), limit(1));
+
+        // Try by Document ID first
+        try {
+            const docRef = doc(db, 'articles', String(id));
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                await updateDoc(docRef, { views: increment(1) });
+                return;
+            }
+        } catch (e) { }
+
+        // Fallback
+        const q = query(collection(db, 'articles'), where('id', '==', Number(id)), limit(1));
         const snapshot = await getDocs(q);
         if (!snapshot.empty) {
             await updateDoc(snapshot.docs[0].ref, {
