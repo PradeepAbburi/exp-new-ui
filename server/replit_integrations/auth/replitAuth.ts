@@ -23,7 +23,7 @@ export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const sessionStore = new session.MemoryStore();
   return session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || "default_dev_secret",
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
