@@ -244,7 +244,13 @@ export async function registerRoutes(
       const updated = await storage.updateArticle(req.params.id as any, input);
       res.json(updated);
     } catch (err) {
-      res.status(400).json({ message: "Invalid input" });
+      if (err instanceof z.ZodError) {
+        console.error("Validation error:", err.errors);
+        res.status(400).json({ message: "Invalid input", errors: err.errors });
+      } else {
+        console.error("Update error:", err);
+        res.status(400).json({ message: "Invalid input" });
+      }
     }
   });
 
