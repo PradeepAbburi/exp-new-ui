@@ -729,14 +729,22 @@ function BlockEditor({
       return (
         <div className="rounded-xl border border-border p-4 bg-card/50 overflow-x-auto">
           <div className="flex items-center gap-2 mb-4">
-            <button onClick={addRow} className="text-xs flex items-center gap-1 px-2 py-1 bg-secondary rounded hover:text-primary"><Plus className="w-3 h-3" /> Row</button>
-            <button onClick={addCol} className="text-xs flex items-center gap-1 px-2 py-1 bg-secondary rounded hover:text-primary"><Plus className="w-3 h-3" /> Col</button>
-            <label className="flex items-center gap-2 text-xs text-muted-foreground ml-auto cursor-pointer">
+            <div className="flex items-center bg-secondary rounded-lg overflow-hidden border border-border/50">
+              <button onClick={addRow} className="px-3 py-1.5 hover:bg-background/50 hover:text-primary transition-colors flex items-center gap-1 text-xs border-r border-border/50"><Plus className="w-3 h-3" /> Row</button>
+              <button onClick={() => removeRow(rows.length - 1)} className="px-3 py-1.5 hover:bg-destructive/10 hover:text-destructive transition-colors flex items-center gap-1 text-xs"><Minus className="w-3 h-3" /></button>
+            </div>
+
+            <div className="flex items-center bg-secondary rounded-lg overflow-hidden border border-border/50">
+              <button onClick={addCol} className="px-3 py-1.5 hover:bg-background/50 hover:text-primary transition-colors flex items-center gap-1 text-xs border-r border-border/50"><Plus className="w-3 h-3" /> Col</button>
+              <button onClick={() => removeCol(rows[0].length - 1)} className="px-3 py-1.5 hover:bg-destructive/10 hover:text-destructive transition-colors flex items-center gap-1 text-xs"><Minus className="w-3 h-3" /></button>
+            </div>
+
+            <label className="flex items-center gap-2 text-xs text-muted-foreground ml-auto cursor-pointer select-none hover:text-foreground transition-colors">
               <input
                 type="checkbox"
                 checked={withHeader}
                 onChange={(e) => onChange({ attrs: { ...block.attrs, withHeader: e.target.checked } })}
-                className="rounded border-border"
+                className="rounded border-border w-3.5 h-3.5"
               />
               Header Row
             </label>
@@ -747,26 +755,15 @@ function BlockEditor({
               {rows.map((row, rowIndex) => (
                 <tr key={rowIndex} className="border-b border-border/50 last:border-0 group/row">
                   {row.map((cell, colIndex) => (
-                    <td key={`${rowIndex}-${colIndex}`} className={clsx("p-0 relative border-r border-border/50 last:border-0 group/cell", rowIndex === 0 && withHeader && "bg-muted/30 font-bold")}>
+                    <td key={`${rowIndex}-${colIndex}`} className={clsx("p-0 relative border-r border-border/50 last:border-0", rowIndex === 0 && withHeader && "bg-muted/30 font-bold")}>
                       <input
                         value={cell}
                         onChange={(e) => updateCell(rowIndex, colIndex, e.target.value)}
                         className="w-full bg-transparent px-3 py-2 outline-none text-sm min-w-[100px]"
                         placeholder={rowIndex === 0 && withHeader ? "Header" : ""}
                       />
-                      {/* Column controls - show on hover of the cell area */}
-                      <button
-                        onClick={() => removeCol(colIndex)}
-                        className="absolute -top-2 right-0 opacity-0 group-hover/cell:opacity-100 p-0.5 bg-destructive/80 hover:bg-destructive text-white rounded transition-opacity z-10 scale-75"
-                        title="Remove Column"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
                     </td>
                   ))}
-                  <td className="w-8 sticky right-0 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                    <button onClick={() => removeRow(rowIndex)} className="p-1 hover:text-destructive text-muted-foreground"><Trash className="w-4 h-4" /></button>
-                  </td>
                 </tr>
               ))}
             </tbody>
