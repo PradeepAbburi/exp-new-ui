@@ -1,7 +1,7 @@
 import type { Express } from "express";
-import { authStorage } from "./storage";
-import { isAuthenticated } from "./replitAuth";
-import { hashPassword } from "./localAuth";
+import { authStorage } from "./storage.js";
+import { isAuthenticated } from "./replitAuth.js";
+import { hashPassword } from "./localAuth.js";
 import passport from "passport";
 import { z } from "zod";
 

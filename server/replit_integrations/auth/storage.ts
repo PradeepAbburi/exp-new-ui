@@ -1,5 +1,5 @@
-import { storage as mainStorage } from "../../firestore-storage";
-import { type User, type UpsertUser } from "@shared/models/auth";
+import { storage as mainStorage } from "../../firestore-storage.js";
+import { type User, type UpsertUser } from "../../../shared/models/auth.js";
 
 export interface IAuthStorage {
   getUser(id: string): Promise<User | undefined>;
